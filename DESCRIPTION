@@ -10,7 +10,7 @@ LazyData: true
 Maintainer: Amber Barton <amber.barton@paediatrics.ox.ac.uk>
 Author: Amber Barton [aut, cre]
 RoxygenNote: 6.1.1
-Imports: 
+Depends: 
     Hmisc,
     ggplot2
     
