@@ -3,7 +3,7 @@ Title: Hoeffding's D statistic as a Summary Statistic for MA plots
 Version: 0.0.0.9000
 Authors@R: person("Amber Barton", email = "amber.barton@paediatrics.ox.ac.uk", role = c("aut","cre"))
 Description: MA plots are often used in transcriptomics to look at the relationship between abundance/intensity, and the differences in gene expression between two samples. On average, for each value of A (mean expression count or intensity), M (log fold difference) should be zero, and dependence between M and A may suggest the presence of batch effects or outlying samples. As the number of samples increases, the number of MA plots increases quadratically (10 samples = 10*10 = 100 plots). This becomes an even more prohibitively large number when comparing datasets before and after normalisation, batch correction etc. Here we provide functions for calculating and visualising Hoeffding's d statistic, a measure of the dependence between two variables (in this case M and A) as a means of summarising many MA plots. 
-Depends: R (>= 3.5.2)
+Depends: R (>= 3.4.4)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
