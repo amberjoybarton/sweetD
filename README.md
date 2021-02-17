@@ -1,7 +1,8 @@
 sweetD: Hoeffding’s D statistic as a Summary Statistic for MA plots
 ================
 Amber Barton
-<img src="sweetD-Instructions_files/figure-gfm/sweetDhex.png" width="10%" />
+
+<img src="sweetD-Instructions_files/figure-gfm/sweetDhex.png" width="10%" align = "right" />
 
 ## Background
 
