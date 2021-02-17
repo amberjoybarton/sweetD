@@ -1,0 +1,127 @@
+---
+title: "sweetD: Hoeffding's D statistic as a Summary Statistic for MA plots"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sweetD}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Background
+
+In transcriptomic data, MA plots are commonly used to visualise the relationship between M (log fold difference between two samples) and A (he average abundance (intensity or counts) of a gene). Each dot represents a gene or other feature. MA plots are often used to illustrate differential expression, as the further a gene is away from an “M” of zero, the more different it is between samples or groups. MA plots also a good way to check for batch effects, or whether your normalisation has been successful. 
+
+Since we only expect a minority of genes to be differentially expressed, MA plots should generally be symmetrical, with M averaging at 0 for each abundance. 
+
+```{r echo=FALSE, message = F, warning = F, fig.width =5 }
+library(sweetD)
+library(devtools)
+library(RColorBrewer)
+library(ggplot2)
+data("expr.normalised")
+MAplot(expr.normalised, "S1", "S2")
+```
+
+When carrying out quality control, MA plots can be used to compare a sample to the whole dataset’s median, or to another sample, in order to check for batch effects, outlying samples or normalisation issues. However, as the number of samples increases, the number of MA plots grows quadratically. Therefore it quickly becomes impossible for each plot to be manually inspected.
+
+Furthermore, if M does not centre around zero for each abundance, attempts to rectify this through normalisation, batch correction or outlier exclusion increases the number of plots to examine even further. 
+
+```{r echo=FALSE, message = F, warning = F, fig.width =5}
+ex = as.data.frame(matrix(nrow = 300, ncol = 3))
+ex$Samples = c(1:100, 1:100, 1:100)
+ex$ProcessingSteps = c(rep(0,100), rep(1,100), rep(2,100))
+ex$MAplots = (ex$ProcessingSteps+1)*(ex$Samples^2)
+ex = ex[,4:6]
+library(RColorBrewer)
+ggplot(ex, aes(x = Samples, y = MAplots, color = as.factor(ProcessingSteps))) + geom_line(aes(group = ProcessingSteps), size = 4) + theme_bw() + scale_color_brewer(palette = "RdPu") + labs(y = "Number of MA plots", color = "Number of processing steps e.g. normalisation") + theme(legend.position = "bottom")
+```
+
+Here we use Hoeffding’s D statistic as a non-parametric measure of dependence between M and A, so that large numbers of MA plots need not be inspected. If a sample’s D statistic is high, this means there is a relationship between M and A. However unlike linear tests, this relationship can be non-monotonic. 
+
+## Installation
+
+sweetD can be installed through github using the package devtools. It is dependent on the packages ggplot2 and Hmisc.
+
+
+```{r echo=T, message = F, warning = F}
+library(devtools)
+devtools::install_github("amberjoybarton/sweetD")
+library(sweetD)
+```
+
+Three datasets are included in the package for use in this tutorial, representing transciptomics data at three stages of a pipeline: the raw data, after batch correction, and after quantile normalisation. The datasets each contain 20 samples, labelled “S1-20” in the expression matrices.
+
+```{r echo=T, message = F, warning = F}
+data(expr.raw, expr.batchcorrected, expr.normalised)
+head(expr.raw)
+```
+
+Five functions are included in this package: MAplot(), sweetDmedian(), sweetDplot(), sweetDall() and sweetDheatmap().
+
+## Hoeffding’s D statistic against the median
+
+In some cases, for example when we have a large number of samples, we may want to compare each sample to the median of its expression matrix, rather than calculating D for every sample-sample combination.
+
+To calculate at Hoeffding’s D statistic compared with the median for the three example datasets, the function sweetDmedian can be used.
+
+```{r echo=T, message = F, warning = F, eval = F, results='hide'}
+Result = sweetDmedian(expr.raw, expr.batchcorrected, expr.normalised)
+```
+
+```{r echo=F, message = F, warning = F, results='hide'}
+Result = sweetDmedian(expr.raw, expr.batchcorrected, expr.normalised)
+```
+
+Results are ordered by Hoeffding’s D statistic.
+
+```{r echo=T, message = F, warning = F}
+head(Result)
+```
+
+sweetDplot() can then be used to visualise how the distribution of D statistics changes with normalisation. Each dot represents a sample. In this example, normalisation appears to have been successful in eliminating a relationship between M and A. The darker dots with a high D statistics correspond to samples which may have MA plots to be concerned about. 
+
+```{r echo=T, message = F, warning = F, fig.width =5}
+sweetDplot(Result)
+```
+
+To directly visualise the MA plots of these samples, the function MAplot() can be used. 
+
+```{r echo=T, message = F, warning = F, fig.width =5}
+MAplot(expr.raw, "S14")
+```
+
+## Hoeffding’s D statistic against other samples
+
+Another option would be to compare each sample to every other sample in our dataset to identify batch effects or outliers.
+
+```{r echo=T, message = F, warning = F, eval = F, results='hide'}
+Results_all = sweetDall(expr.raw, expr.batchcorrected, expr.normalised)
+```
+
+```{r echo=F, message = F, warning = F,  results='hide'}
+Results_all = sweetDall(expr.raw, expr.batchcorrected, expr.normalised)
+```
+
+```{r echo=T, message = F, warning = F}
+head(Results_all)
+```
+
+This can then be visualised using the function sweetDheatmap().
+
+```{r echo=T, message = F, warning = F, fig.width =10}
+sweetDheatmap(Results_all)
+```
+
+Darker tiles represent those with greater dependence between M and A. For example, the comparison between Sample 11 and 14 gives a high D statistic in the raw data, but not in the normalised data.
+
+```{r echo=T, message = F, warning = F, fig.width =5}
+MAplot(expr.raw, "S11", "S14")
+MAplot(expr.normalised, "S11", "S14")
+```
