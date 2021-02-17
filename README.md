@@ -12,7 +12,7 @@ Amber Barton
 
 In transcriptomic data, MA plots are commonly used to visualise the
 relationship between M (log fold difference between two samples) and A
-(he average abundance (intensity or counts) of a gene). Each dot
+(the average abundance (intensity or counts) of a gene). Each dot
 represents a gene or other feature. MA plots are often used to
 illustrate differential expression, as the further a gene is away from
 an “M” of zero, the more different it is between samples or groups. MA
