@@ -161,7 +161,7 @@ MAplot(expr.raw, "S14")
 
 Another option would be to compare each sample to every other sample in
 our dataset to identify batch effects or
-    outliers.
+    outliers. This is computationally intensive so for large datasets it may be worth limiting the analysis to a random subset of genes.
 
 ``` r
 Results_all = sweetDall(expr.raw, expr.batchcorrected, expr.normalised)
