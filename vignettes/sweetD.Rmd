@@ -99,7 +99,8 @@ MAplot(expr.raw, "S14")
 
 ## Hoeffding’s D statistic against other samples
 
-Another option would be to compare each sample to every other sample in our dataset to identify batch effects or outliers.
+Another option would be to compare each sample to every other sample in our dataset to identify batch effects or outliers. This is computationally intensive so for large datasets it may be worth limiting the analysis to a random subset of genes.
+
 
 ```{r echo=T, message = F, warning = F, eval = F, results='hide'}
 Results_all = sweetDall(expr.raw, expr.batchcorrected, expr.normalised)
